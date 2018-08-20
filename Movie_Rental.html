@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>React - Component</title>
+    <script src="../../js/react.min.js"></script>
+    <script src="../../js/react-dom.min.js"></script>
+    <script src="../../js/browser.min.js"></script>
+    
+</head>
+<body>
+
+<div id="container"></div>
+
+<script type="text/babel">
+
+
+
+    const leftdiv = {
+                        height: '100%' , width: '20%' ,float: 'left'
+                     }
+
+    const rightdiv = {
+                    height: '100%' , width: '80%' ,float: 'right'
+                    }
+
+     const seperator = {
+                            height: "920",
+                              width: "1px",
+                              background: "black",
+                              top: "0",
+                              bottom: "0",
+                              position: "absolute",
+                              left: "19%"
+
+                         }
+
+
+
+    class Parent extends React.Component {
+
+
+        constructor(props) {
+            super(props);
+
+            this.state = {   Total: 0,
+              data : []
+            }
+
+                this.changeName = this.changeName.bind(this);
+}
+
+          changeName(newName) {
+
+            let temptot = 0;
+            temptot = temptot+ this.state.Total
+
+            temptot = temptot + parseInt( newName) ;
+
+            this.setState({
+             Total: temptot
+            });
+          }
+
+
+          componentDidMount(){
+                                     {
+                                                          fetch('https://movie-rental-51a59.firebaseio.com/movies.json')
+                                                         .then((resp)=>resp.json()).
+                                                         then((fresp) =>{
+                                                                console.log(fresp );
+
+                                                                this.setState({data : fresp})
+                                                         })
+                                     }
+                               }
+
+        render() {
+
+            return (
+
+                <div>
+                    <div style={leftdiv}>
+                             <h3>Total Number Of Movies : {Object.keys(this.state.data).length} </h3>
+                             <h3>Total Reserved : {this.state.Total}</h3>
+                     </div>
+                    <div style={seperator}></div>
+
+                     <div style={rightdiv}>
+
+                         {
+                             this.state.data.map((Data , key) =>
+
+                             <Child Data = {Data} key={Data.id} imgsrc={Data.imageUrl} title={Data.name} info={Data.snippet} onChange={this.changeName }></Child>
+
+                             )
+                         }
+
+                     </div>
+
+                </div>
+            );
+        }
+    }
+
+    class Child extends React.Component {
+
+        constructor(props) {
+                    super(props);
+
+                    this.state = {
+                        click : 1,
+                         text : 'Reserve' ,
+                        color : 'green'
+
+                    }
+
+                     this.handleChange = this.handleChange.bind(this);
+
+                };
+
+        handleChange(e) {
+            const name = e.target.value;
+
+            let tcolor = name == 1 ? "red" : "green" ;
+            this.setState({color : tcolor});
+
+            let tclick = name == 1 ? -1 : 1 ;
+            this.setState({click : tclick})
+
+
+            let ttext  = this.state.click == 1 ? "Return" : "Reserve"
+            this.setState({text: ttext})
+
+            this.props.onChange(name);
+
+        }
+
+
+
+
+        render() {
+            return (
+                         <div>
+
+                                   <img style={{  float: "left",
+                                                  height: "100px",
+                                                  margin: "-0.5em 1em 1.5em 0",
+                                                  paddingBottom: "1em",
+                                                  width: "100px"}} src = {this.props.imgsrc} />
+
+                                    <h3>{this.props.title}</h3>
+                                    <p>{this.props.info}</p><br />
+
+                            <button onClick= {this.handleChange } value = {this.state.click} style={ {backgroundColor : this.state.color , color :'white'}} >{this.state.text}</button>
+
+
+                                   <hr/>
+
+                         </div>
+            );
+        }
+    }
+
+    ReactDOM.render(<Parent/>, document.getElementById('container'));
+</script>
+<!-- ReactDOM.render(<div><BuckysComponent /><Baaa /></div>, document.getElementById('container'));-->
+</body>
+</html>
